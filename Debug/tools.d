@@ -1,0 +1,1 @@
+tools.d: ../tools.cpp
