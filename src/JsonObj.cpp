@@ -122,17 +122,7 @@ std::string JsonObj::example() {
 }
 
 
-std::string JsonObj::toJson(std::vector<std::string>& data){
-	/*
-	type
-	data[0]
-
-	position  				direction
-	data[1]					data[4]
-	data[2]					data[5]
-	data[3]					data[6]
-	 */
-
+std::string JsonObj::toJson(Message_s& data){
 	ptree pt;
 	ptree children;
 
@@ -140,15 +130,15 @@ std::string JsonObj::toJson(std::vector<std::string>& data){
 	ptree v1palm,v2palm,v3palm;
 	ptree v1dir, v2dir, v3dir;
 
-	v1palm.put("",data[1]);
-	v2palm.put("",data[2]);
-	v3palm.put("",data[3]);
+	v1palm.put("",data.xp);
+	v2palm.put("",data.yp);
+	v3palm.put("",data.zp);
 
-	v1dir.put("",data[4]);
-	v2dir.put("",data[5]);
-	v3dir.put("",data[6]);
+	v1dir.put("",data.xd);
+	v2dir.put("",data.yd);
+	v3dir.put("",data.zd);
 
-	type.put("", data[0]);
+	type.put("", data.handType);
 
 
 	palmPosition.push_back(std::make_pair("", v1palm));
@@ -163,7 +153,7 @@ std::string JsonObj::toJson(std::vector<std::string>& data){
 	children.push_back(std::make_pair("", palmPosition));
 	children.push_back(std::make_pair("", direction));
 
-	pt.put("FrameRate", data[7]);
+	pt.put("FrameRate", data.fps);
 	pt.add_child("Hands", children);
 
 	std::ostringstream buf;
@@ -171,4 +161,5 @@ std::string JsonObj::toJson(std::vector<std::string>& data){
 	std::string json = buf.str();
 	return json;
 }
+
 

@@ -95,13 +95,15 @@ void LeapEventListener::onFrame(const Controller& controller) {
 }
 
 std::string LeapEventListener::constructJSON(Frame& frame){
-	std::vector<std::string> data;
+
+	Message_s msg;
+
 	JsonObj obj;
 
 	HandList hands = frame.hands();
 	const Hand hand = hands[0];//pour le moment je ne gère qu'une main a la fois.
 	std::string handType = hand.isLeft() ? "Left hand" : "Right hand";
-	data.push_back(handType);
+	msg.handType = handType;
 
 	const Vector normal = hand.palmNormal();
 	float fps = frame.currentFramesPerSecond();
@@ -110,26 +112,25 @@ std::string LeapEventListener::constructJSON(Frame& frame){
 	std::string y = boost::lexical_cast<std::string>(normal.y);
 	std::string z = boost::lexical_cast<std::string>(normal.z);
 
-	data.push_back(x);
-	data.push_back(y);
-	data.push_back(z);
+	msg.xp=x;
+	msg.yp=y;
+	msg.zp=z;
 
 	const Vector direction = hand.direction();
 
 	std::string x1 = boost::lexical_cast<std::string>(direction.x);
 	std::string y1 = boost::lexical_cast<std::string>(direction.y);
 	std::string z1 = boost::lexical_cast<std::string>(direction.z);
-
 	std::string fp = boost::lexical_cast<std::string>(fps);
 
-	data.push_back(x1);
-	data.push_back(y1);
-	data.push_back(z1);
-	data.push_back(fp);
+	msg.xd=x1;
+	msg.yd=y1;
+	msg.zd=z1;
+	msg.fps=fp;
 
-	std::string result = obj.toJson(data);
-	data.clear();
-	return result;
+	std::string result2 = obj.toJson(msg);
+
+	return result2;
 }
 
 

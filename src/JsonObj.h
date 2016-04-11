@@ -15,12 +15,33 @@
 
 #include <boost/property_tree/json_parser.hpp>
 
+struct Message_s
+{
+	std::string handType;
+	//palmNormal vector
+	std::string xp;
+	std::string yp;
+	std::string zp;
+
+	//direction vector
+	std::string xd;
+	std::string yd;
+	std::string zd;
+
+	std::string fps;
+};
+
+typedef struct Message_s Message_s;
+
+
 class JsonObj {
 public:
 	JsonObj();
 	virtual ~JsonObj();
 	std::string example();
-	std::string toJson(std::vector<std::string>& data);
+	std::string toJson(Message_s& data);
+
+
 	std::string stringify();// in order to send the JSON trough the websocket as a string
 
 

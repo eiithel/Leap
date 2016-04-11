@@ -22,24 +22,6 @@
 using namespace Leap;
 
 
-struct Message_s
-{
-	std::string handType;
-	//palmNormal vector
-	std::string xp;
-	std::string yp;
-	std::string zp;
-
-	//direction vector
-	std::string xd;
-	std::string yd;
-	std::string zd;
-
-	std::string fps;
-};
-
-typedef struct Message_s Message_s;
-
 
 class LeapEventListener : public Listener {
 public:
