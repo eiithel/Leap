@@ -7,10 +7,10 @@
 
 #include "LeapEventListener.h"
 
+
 LeapEventListener::LeapEventListener(): send_msg(false), _pitch(0), _yaw(0){
 	// TODO Auto-generated constructor stub
 	_client.init_connection();
-
 
 }
 
@@ -86,10 +86,12 @@ void LeapEventListener::onDisconnect(const Controller& controller) {
 
 void LeapEventListener::onFrame(const Controller& controller) {
 
+
 	Frame frame = controller.frame();
 
 	std::string msg =this->constructJSON(frame);
 	_client.send_message(msg.c_str(), "/tmp");//envoie des donnees brutes.
+
 	//_client.send_message("json_instruction", "/instructions");
 
 }

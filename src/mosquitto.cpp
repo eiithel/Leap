@@ -17,17 +17,47 @@
 #include "Client.h"
 #include "LeapEventListener.h"
 #include <boost/lexical_cast.hpp>
+#include "Uart.h"
+#include "signal.h"
 
 using namespace std;
+
+void test1(){
+	Uart arduino;
+	arduino.init();
+	arduino.open("/dev/ttyACM0");
+
+	char* buf = "1 on\n";
+	int taille = strlen(buf);
+
+	while(1){
+		arduino.write(buf,taille);
+		sleep(5);
+	}
+}
+
+volatile bool stop = false;
+
+void signalHandler( int signum )
+{
+	std::cout << "Interrupt signal (" << signum << ") received.\n";
+	stop = true;
+	exit(0);
+
+}
+
 
 
 int main(int argc, char *argv[])
 {
 
 	if ((argc > 1 && strcmp(argv[1], "-h") == 0) || (argc > 1 && strcmp(argv[1], "--help") == 0)){
-		std::cout << "Usage: mqtt [OPTION...] " << std::endl;
+		std::cout << "Usage: mqtt [OPTION...] hello world " << std::endl;
 		exit(0);
 	}
+
+	signal(SIGINT, signalHandler); // if the user interrupts the process ctrl+C
+	signal(SIGTERM, signalHandler);// if the user kills the process
 
 
 	Controller controller;// start a new thread
@@ -36,8 +66,15 @@ int main(int argc, char *argv[])
 
 	controller.addListener(listener);
 
-	while(!mosquitto_loop(client._mosq, -1, 1)){
+	while(!stop){
+
+		while(!mosquitto_loop(client._mosq, -1, 1)){
+		}
 	}
+
+
+
+	printf("exit\n");
 
 	return 0;
 }

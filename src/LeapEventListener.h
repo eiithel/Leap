@@ -16,7 +16,7 @@
 #include "Client.h"
 #include "JsonObj.h"
 #include <boost/lexical_cast.hpp>
-
+#include "Uart.h"
 
 
 using namespace Leap;
@@ -40,6 +40,7 @@ public:
 	int _yaw;
 	Client _client;
 	JsonObj _jsonObj;
+	Uart _arduino;
 
 
 };
