@@ -32,6 +32,9 @@ public:
 	virtual void onFrame(const Controller&);
 	std::string constructJSON(Frame& frame);
 	void handleHand(Hand& hand);
+	void handleCircle(Gesture& gesture);
+	void handleSwipe(Gesture& gesture);
+
 
 
 	std::vector<Frame> _vec;

@@ -24,48 +24,6 @@ const std::string boneNames[] = {"Metacarpal", "Proximal", "Middle", "Distal"};
 const std::string stateNames[] = {"STATE_INVALID", "STATE_START", "STATE_UPDATE", "STATE_END"};
 
 
-int radian_to_degree(int  ENTER) {
-	double Pi = 3.14159265;
-	int degrees = (ENTER * 180) / Pi;
-	return degrees;
-}
-
-/**
- * Force a value to be between 0 and 180 degrees for servo
- * @param value degree value returned by Leap Controller
- * @return normalized value between 0-180
- */
-int normalizeDegree(int value){
-	value = (value > 90)  ? 90  : value;
-	value = (value < -90) ? -90 : value;
-	return value+90;
-}
-
-/**
- * Get a PWM value from degree closely modeled by a quadratic equation
- * @param degree pitch degree value
- * @return PWM value
- */
-static double pitchDegreeToPWM(double degree){
-	double a = 0.00061728395;
-	double b = 2.38888888889;
-	double c = 150;
-	return a*(degree*degree) + b*degree + c;
-}
-
-/**
- * Get a PWM value from degree closely modeled by a quadratic equation
- * @param degree pitch degree value
- * @return PWM value
- */
-static double yawDegreeToPWM(double degree){
-	double a = 0.0;
-	double b = 3.19444444;
-	double c = 150;
-	return a*(degree*degree) + b*degree + c;
-}
-
-
 void LeapEventListener::onConnect(const Controller& controller) {
 	std::cout << "Connected" << std::endl;
 	// Enable gestures, set Config values:
@@ -89,6 +47,8 @@ void LeapEventListener::onFrame(const Controller& controller) {
 	std::string handtype;//a voir a quoi ca peut servir
 	Frame frame = controller.frame();
 	//we begin to test the handtype
+
+	/*
 	for (Hand hand : frame.hands()) {
 
 		if (hand.isLeft()) {
@@ -98,8 +58,27 @@ void LeapEventListener::onFrame(const Controller& controller) {
 			handtype = "right";
 			handleHand(hand);
 		}
-	}
 
+	}
+	 */
+
+	for(Gesture gesture : frame.gestures()){
+		switch (gesture.type()) {
+		case gesture.TYPE_CIRCLE:
+
+		handleCircle(gesture);
+		//handleCircle ==> envoyer dans channel "/type_circle"
+
+		break;
+		case gesture.TYPE_SWIPE:
+
+		handleSwipe(gesture);
+		//handSwipe (determinate the sense) and send in channel "/type_swipe"
+		default:
+			break;
+		}
+
+	}
 
 	std::string msg =this->constructJSON(frame);
 	_client.send_message(msg.c_str(), "/tmp");//envoie des donnees brutes.
@@ -161,8 +140,8 @@ void LeapEventListener::handleHand(Hand& hand){
 	_pitch  = Math::constraint(_pitch);
 
 	// Get PWM Values
-	_yaw   = (int) yawDegreeToPWM(_yaw);
-	_pitch = (int) pitchDegreeToPWM(_pitch);
+	_yaw   = (int) Math::yawDegreeToPWM(_yaw);
+	_pitch = (int) Math::pitchDegreeToPWM(_pitch);
 
 
 	int oldYaw    = (isLeft) ? oldLeftYaw   : oldRightYaw;
@@ -193,5 +172,15 @@ void LeapEventListener::handleHand(Hand& hand){
 	//return payload;
 }
 
+void LeapEventListener::handleCircle(Gesture& gesture){
+	if(gesture.state()==gesture.STATE_STOP){//if the movement is finished
+		_client.send_message("1", "/gesture/type_circle");// modify message later...
+	}
+}
 
+void LeapEventListener::handleSwipe(Gesture& gesture){
+	if(gesture.state()==gesture.STATE_STOP){
+		_client.send_message("1", "/gesture/type_swipe");// modify message later...
+	}
+}
 

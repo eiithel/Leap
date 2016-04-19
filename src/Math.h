@@ -27,6 +27,12 @@ public:
 
 	static int constraint(int angleDegre);
 
+	static int normalizeDegree(int value);
+
+	static double pitchDegreeToPWM(double degree);
+
+	static double yawDegreeToPWM(double degree);
+
 };
 
 #endif /* SRC_MATH_H_ */
