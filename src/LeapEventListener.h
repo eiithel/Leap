@@ -16,12 +16,12 @@
 #include "Client.h"
 #include "JsonObj.h"
 #include <boost/lexical_cast.hpp>
+
+#include "Math.h"
 #include "Uart.h"
 
 
 using namespace Leap;
-
-
 
 class LeapEventListener : public Listener {
 public:
@@ -31,6 +31,7 @@ public:
 	virtual void onDisconnect(const Controller&);
 	virtual void onFrame(const Controller&);
 	std::string constructJSON(Frame& frame);
+	void handleHand(Hand& hand);
 
 
 	std::vector<Frame> _vec;
@@ -38,10 +39,10 @@ public:
 	std::string _str;
 	int _pitch;
 	int _yaw;
+	int oldRightYaw,oldRightPitch,oldLeftYaw,oldLeftPitch;
 	Client _client;
 	JsonObj _jsonObj;
 	Uart _arduino;
-
 
 };
 

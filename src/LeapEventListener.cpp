@@ -8,7 +8,7 @@
 #include "LeapEventListener.h"
 
 
-LeapEventListener::LeapEventListener(): send_msg(false), _pitch(0), _yaw(0){
+LeapEventListener::LeapEventListener(): send_msg(false), _pitch(0), _yaw(0),oldRightYaw(0),oldRightPitch(0),oldLeftYaw(0),oldLeftPitch(0){
 	// TODO Auto-generated constructor stub
 	_client.init_connection();
 
@@ -86,8 +86,20 @@ void LeapEventListener::onDisconnect(const Controller& controller) {
 
 void LeapEventListener::onFrame(const Controller& controller) {
 
-
+	std::string handtype;//a voir a quoi ca peut servir
 	Frame frame = controller.frame();
+	//we begin to test the handtype
+	for (Hand hand : frame.hands()) {
+
+		if (hand.isLeft()) {
+			handtype = "left";
+			handleHand(hand);
+		} else {
+			handtype = "right";
+			handleHand(hand);
+		}
+	}
+
 
 	std::string msg =this->constructJSON(frame);
 	_client.send_message(msg.c_str(), "/tmp");//envoie des donnees brutes.
@@ -134,5 +146,52 @@ std::string LeapEventListener::constructJSON(Frame& frame){
 
 	return result2;
 }
+
+void LeapEventListener::handleHand(Hand& hand){
+	bool isLeft   = hand.isLeft();
+	std::string handType  = (isLeft) ? "left" : "right";
+
+	Vector direction = hand.direction();
+	_yaw = Math::radiansDegrees(direction.yaw());
+	_pitch = Math::radiansDegrees(direction.pitch());
+
+	// Normalize Yaw and Pitch
+	_yaw    = Math::constraint(_yaw);
+	_pitch *= (isLeft) ? -1 : 1;
+	_pitch  = Math::constraint(_pitch);
+
+	// Get PWM Values
+	_yaw   = (int) yawDegreeToPWM(_yaw);
+	_pitch = (int) pitchDegreeToPWM(_pitch);
+
+
+	int oldYaw    = (isLeft) ? oldLeftYaw   : oldRightYaw;
+	int oldPitch  = (isLeft) ? oldLeftPitch : oldRightPitch;
+	if( (fabs((double)(oldPitch - _pitch) > 5))  || (fabs((double)(oldYaw - _yaw) > 5) )) {
+
+
+		//_jsonObj.put(_yaw, ); //acces au ptree?
+		/*
+		payload.put(handType + "yaw",   _yaw);
+		payload.put(handType + "pitch", _pitch);
+		 */
+		if (isLeft) {
+			oldLeftYaw   = _yaw;
+			oldLeftPitch = _pitch;
+		} else {
+			oldRightYaw   = _yaw;
+			oldRightPitch = _pitch;
+		}
+	}
+	else{
+		/*
+		payload.put(handType + "_yaw", oldYaw);
+		payload.put(handType + "_pitch", oldPitch);
+		 */
+	}
+
+	//return payload;
+}
+
 
 

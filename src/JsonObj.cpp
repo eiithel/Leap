@@ -162,4 +162,15 @@ std::string JsonObj::toJson(Message_s& data){
 	return json;
 }
 
+//for yaw and pitch
+std::string JsonObj::put(std::string& data, ptree& node){
+	node.put("",data);
+
+	//savoir si c'est l'arbre yaw ou pitch
+	std::ostringstream buf;
+	write_json (buf, node, false);
+	std::string json = buf.str();
+}
+
+
 

@@ -15,6 +15,9 @@
 
 #include <boost/property_tree/json_parser.hpp>
 
+using boost::property_tree::ptree;
+
+
 struct Message_s
 {
 	std::string handType;
@@ -30,8 +33,30 @@ struct Message_s
 
 	std::string fps;
 };
-
 typedef struct Message_s Message_s;
+
+struct Payload_s
+{
+	ptree pt;
+	ptree children;
+
+	ptree palmPosition, direction, type;
+	ptree v1palm,v2palm,v3palm;
+	ptree v1dir, v2dir, v3dir;
+};
+
+typedef struct Payload_s Payload_s;
+
+struct yp_s
+{
+	ptree pt;
+	ptree children;
+
+	ptree yaw;
+	ptree pitch;
+};
+
+typedef struct yp_s yp_s;
 
 
 class JsonObj {
@@ -40,6 +65,7 @@ public:
 	virtual ~JsonObj();
 	std::string example();
 	std::string toJson(Message_s& data);
+	std::string put(std::string& data, ptree& node);
 
 
 	std::string stringify();// in order to send the JSON trough the websocket as a string
@@ -47,6 +73,7 @@ public:
 
 	std::vector< std::pair<std::string, std::string> > _handsVector;
 	std::vector< std::pair<std::string, std::string> > _fingersVector;
+	Payload_s _payload;
 
 };
 
