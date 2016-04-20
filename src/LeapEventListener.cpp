@@ -80,8 +80,8 @@ void LeapEventListener::onFrame(const Controller& controller) {
 
 	}
 
-	std::string msg =this->constructJSON(frame);
-	_client.send_message(msg.c_str(), "/tmp");//envoie des donnees brutes.
+	//std::string msg =this->constructJSON(frame);
+	//_client.send_message(msg.c_str(), "/tmp");//envoie des donnees brutes.
 
 	//_client.send_message("json_instruction", "/instructions");
 

@@ -7,7 +7,9 @@
 
 #include "Client.h"
 
-Client::Client(): _host("localhost"), _port(1883), _keepalive(60), _clean_session(true),_mosq(NULL){
+bool isdetected =false;
+
+Client::Client(): _host("localhost"), _port(1883), _keepalive(60), _clean_session(true),_mosq(NULL), _circleDetected(false){
 
 }
 
@@ -40,10 +42,16 @@ void my_message_callback(struct mosquitto *mosq, void *userdata, const struct mo
 {
 	if(message->payloadlen){
 		printf("fonction message_callback est appelee\n");
+		if( strcmp( message->topic, "/gesture/type_circle" ) == 0 ){
+			printf("cercle detecte!!!!\n");
+			isdetected = true;
+		}
 		printf("%s %s\n", message->topic, message->payload);
+		//trouver le moyen de lire le message du topic qui nous interesse
 	}else{
 		printf("%s (null)\n", message->topic);
 	}
+
 	fflush(stdout);
 }
 
@@ -53,6 +61,10 @@ void my_connect_callback(struct mosquitto *mosq, void *userdata, int result)
 		/* Subscribe to broker information topics on successful connect. */
 		mosquitto_subscribe(mosq, NULL, "/tmp/#", 2);
 		//send_message(mosq,"envoie depuis le client");//ok
+		//Subscribe to type_circle information.
+		mosquitto_subscribe(mosq, NULL, "/gesture/type_circle", 2);
+		mosquitto_subscribe(mosq, NULL, "/gesture/type_swipe", 2);
+
 	}else{
 		fprintf(stderr, "Connect failed\n");
 	}
@@ -94,6 +106,13 @@ int Client::init_connection(){
 		fprintf(stderr, "Unable to connect.\n");
 		return 1;
 	}
+
+}
+
+int Client::subscribe(const char *sub){
+	//mosquitto_subscribe(mosq, NULL, sub, 2);
+	int ret= mosquitto_subscribe(_mosq, NULL, sub, 2);
+	return(ret == MOSQ_ERR_SUCCESS);
 
 }
 

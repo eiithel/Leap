@@ -27,9 +27,12 @@ public:
 	int _keepalive;
 	bool _clean_session;
 	struct mosquitto *_mosq;
+	struct mosquitto_message *_msgcopy;
+	bool _circleDetected;
 
 	int init_connection();
 	bool send_message(const  char * message, const char *topic);
+	int subscribe(const char *sub);
 	bool send_Json(const  JsonObj * json);
 
 
