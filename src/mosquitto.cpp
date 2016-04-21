@@ -22,20 +22,6 @@
 
 using namespace std;
 
-void test1(){
-	Uart arduino;
-	arduino.init();
-	arduino.open("/dev/ttyACM0");
-
-	char* buf = "1 on\n";
-	int taille = strlen(buf);
-
-	while(1){
-		arduino.write(buf,taille);
-		sleep(5);
-	}
-}
-
 volatile bool stop = false;
 
 void signalHandler( int signum )
